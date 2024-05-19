@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  files     File[]
+  sessions  Session[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+}
+
+model File {
+  id         Int      @id @default(autoincrement())
+  filename   String   @unique
+  extension  String
+  mimeType   String   @map("mime_type")
+  size       Float
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  device       String
+  refreshToken String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int      @map("user_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+}
+
+model AccessTokenBlackList {
+  accessToken String @unique @map("access_token")
+}
